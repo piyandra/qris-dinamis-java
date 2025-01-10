@@ -1,7 +1,6 @@
 package com.belajarspring.tokoonline.qrcodegenerator.Controller;
 
 import com.belajarspring.tokoonline.qrcodegenerator.Service.QuickResponseStringGenerator;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @RestController
 public class PhotoController {
