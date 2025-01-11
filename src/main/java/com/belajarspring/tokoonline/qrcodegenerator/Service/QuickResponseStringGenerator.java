@@ -8,7 +8,7 @@ import java.io.IOException;
 @Component
 public class QuickResponseStringGenerator {
 
-    public void qrStringNew(String qrCodeText, String amount, String millis) throws IOException, WriterException {
+    public void qrStringNew(String qrCodeText, String amount, String uuid) throws IOException, WriterException {
 
         GenerateQuickResponseImage generateQuickresponseImage = new GenerateQuickResponseImage();
 
@@ -25,7 +25,7 @@ public class QuickResponseStringGenerator {
 
         String fix = step2[0].trim() + uang + step2[1];
         fix += convertCRC16.convertCRC16(fix);
-        generateQuickresponseImage.generateImage(fix,  millis);
+        generateQuickresponseImage.generateImage(fix,  uuid);
 
     }
 

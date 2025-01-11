@@ -1,37 +1,69 @@
 package com.belajarspring.tokoonline.qrcodegenerator.Controller;
 
+import com.belajarspring.tokoonline.qrcodegenerator.Entity.Image;
+import com.belajarspring.tokoonline.qrcodegenerator.Service.ImageService;
 import com.belajarspring.tokoonline.qrcodegenerator.Service.QuickResponseStringGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @RestController
 public class PhotoController {
 
+    @Autowired
+    private ImageService imageService;
+
     @GetMapping("/photo")
-    public ResponseEntity<byte[]> getPhoto(@RequestParam("qr") String qr, @RequestParam("amount") String amount){
-        String times = String.valueOf(System.currentTimeMillis());
+    public ResponseEntity<String> getPhoto(@RequestParam("qr") String qr, @RequestParam("amount") String amount){
+        UUID randomUUID = UUID.randomUUID();
+        String uuid = randomUUID.toString();
         QuickResponseStringGenerator quickResponseStringGenerator = new QuickResponseStringGenerator();
         if (qr.isEmpty() || amount.isEmpty()) {
-            return ResponseEntity.badRequest().body("Kode QR Atau Nominal Harus Diisi".getBytes());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         try {
-            quickResponseStringGenerator.qrStringNew(qr, amount, times);
+            quickResponseStringGenerator.qrStringNew(qr, amount, uuid);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+        Path path = Path.of("src/main/resources/static/" + uuid + ".png");
         try {
-            Path path = Path.of("src/main/resources/static/" + times + ".png");
-            InputStream in = Files.newInputStream(path);
-            return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(in.readAllBytes());
+
+            File file = new File(path.toString());
+            if (!file.exists()) {
+                return ResponseEntity.notFound().build();
+            }
+            Image savedImage = imageService.saveImage(file);
+            File fileToDelete = new File(path.toString());
+            fileToDelete.delete();
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedImage.getId());
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/photo/{id}")
+    public ResponseEntity<byte[]> getImage(@PathVariable String id) {
+        Image image = imageService.getImageById(id);
+        try {
+            if (image == null) {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(image.getImages());
+    }
+
 }
