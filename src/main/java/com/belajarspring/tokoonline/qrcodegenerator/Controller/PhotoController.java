@@ -1,7 +1,7 @@
 package com.belajarspring.tokoonline.qrcodegenerator.Controller;
 
 import com.belajarspring.tokoonline.qrcodegenerator.Entity.Image;
-import com.belajarspring.tokoonline.qrcodegenerator.Service.ImageService;
+import com.belajarspring.tokoonline.qrcodegenerator.Service.QrisService;
 import com.belajarspring.tokoonline.qrcodegenerator.Service.QuickResponseStringGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ import java.util.UUID;
 public class PhotoController {
 
     @Autowired
-    private ImageService imageService;
+    private QrisService qrisService;
 
     @GetMapping("/photo")
     public ResponseEntity<String> getPhoto(@RequestParam("qr") String qr, @RequestParam("amount") String amount){
@@ -44,7 +44,9 @@ public class PhotoController {
             if (!file.exists()) {
                 return ResponseEntity.notFound().build();
             }
-            Image savedImage = imageService.saveImage(file);
+            Image savedImage = qrisService.saveImage(file);
+
+            // Prepare Delete File
             File fileToDelete = new File(path.toString());
             fileToDelete.delete();
             return ResponseEntity.status(HttpStatus.CREATED).body(savedImage.getId());
@@ -55,7 +57,7 @@ public class PhotoController {
 
     @GetMapping("/photo/{id}")
     public ResponseEntity<byte[]> getImage(@PathVariable String id) {
-        Image image = imageService.getImageById(id);
+        Image image = qrisService.getImageById(id);
         try {
             if (image == null) {
                 return ResponseEntity.notFound().build();
@@ -65,5 +67,7 @@ public class PhotoController {
         }
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(image.getImages());
     }
+
+
 
 }

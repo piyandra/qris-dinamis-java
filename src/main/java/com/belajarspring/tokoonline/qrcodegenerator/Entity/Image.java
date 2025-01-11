@@ -17,6 +17,10 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    private String qr;
+
+    private String amount;
+
     @Lob
     private byte[] images;
 }
