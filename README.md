@@ -1,14 +1,19 @@
 # Generate QRIS statis menjadi QRIS Dinamis
 
-- Endpoint: '/photo'
+## Generate Images QRIS
+- Endpoint `/photo`
 - Method: GET
-- Request Body:
-```json
-{
-  "qr": "",
-  "amount" : ""
-}
-```
+- Query Parameter:
+  - `qr` (string) :
+  - `amount` (string) :
 
-- Response:
-Belum dikerjain bang, ngantuk
+- Response: 
+  - String Of UUID
+
+## View Images QRIS
+- Endpoint `/photo/{id}`
+- Response: 
+  - Image QRIS
+
+
+- Response: Belum dikerjain bang, ngantuk
