@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class QrisRequest {
+public class GenerateQrisRequest {
 
     private String qr;
     private String amount;

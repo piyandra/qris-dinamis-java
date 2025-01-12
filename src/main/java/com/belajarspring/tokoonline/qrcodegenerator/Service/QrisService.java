@@ -1,8 +1,8 @@
 package com.belajarspring.tokoonline.qrcodegenerator.Service;
 
-import com.belajarspring.tokoonline.qrcodegenerator.Entity.Image;
-import com.belajarspring.tokoonline.qrcodegenerator.Model.QrisRequest;
-import com.belajarspring.tokoonline.qrcodegenerator.Model.QrisResponse;
+import com.belajarspring.tokoonline.qrcodegenerator.Entity.Qris;
+import com.belajarspring.tokoonline.qrcodegenerator.Model.GenerateQrisRequest;
+import com.belajarspring.tokoonline.qrcodegenerator.Model.QrisGetDataRequest;
 import com.belajarspring.tokoonline.qrcodegenerator.Repository.QrisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -22,11 +22,13 @@ public class QrisService {
         this.qrisRepository = qrisRepository;
     }
 
-    public Image saveImage(File file) throws IOException {
+    public Qris saveImage(File file, GenerateQrisRequest generateQrisRequest) throws IOException {
         byte[] fileBytes = getFileBytes(file);
-        Image image = new Image();
-        image.setImages(fileBytes);
-        return qrisRepository.save(image);
+        Qris qris = new Qris();
+        qris.setImages(fileBytes);
+        qris.setAmount(generateQrisRequest.getAmount());
+        qris.setQr(generateQrisRequest.getQr());
+        return qrisRepository.save(qris);
     }
 
     public byte[] getFileBytes(File file) throws IOException {
@@ -35,23 +37,18 @@ public class QrisService {
         }
     }
 
-    public Image getImageById(String id) {
-        return qrisRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Image not found"));
+    public Qris getImageById(QrisGetDataRequest qrisGetDataRequest) {
+        return qrisRepository.findById(qrisGetDataRequest.getUuid()).orElse(null);
     }
 
-    private QrisRequest qrisRequest(Image image) {
-        return QrisRequest.builder()
-                .qr(image.getQr())
-                .amount(image.getAmount())
+    private GenerateQrisRequest qrisRequest(Qris qris) {
+        return GenerateQrisRequest.builder()
+                .qr(qris.getQr())
+                .amount(qris.getAmount())
                 .build();
     }
 
-    private QrisResponse qrisResponse(Image image) {
-        return QrisResponse.builder()
-                .qr(image.getQr())
-                .amount(image.getAmount())
-                .build();
-    }
+
 }
 
 
