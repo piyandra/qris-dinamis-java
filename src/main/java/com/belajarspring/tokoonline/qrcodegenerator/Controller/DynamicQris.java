@@ -1,5 +1,4 @@
 package com.belajarspring.tokoonline.qrcodegenerator.Controller;
-
 import com.belajarspring.tokoonline.qrcodegenerator.Entity.Qris;
 import com.belajarspring.tokoonline.qrcodegenerator.Model.ErrorResponse;
 import com.belajarspring.tokoonline.qrcodegenerator.Model.GenerateQrisRequest;
@@ -8,12 +7,10 @@ import com.belajarspring.tokoonline.qrcodegenerator.Model.WebResponse;
 import com.belajarspring.tokoonline.qrcodegenerator.Service.QrisService;
 import com.belajarspring.tokoonline.qrcodegenerator.Service.QuickResponseStringGenerator;
 import com.google.zxing.WriterException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -23,8 +20,11 @@ import java.util.UUID;
 @RestController
 public class DynamicQris {
 
-    @Autowired
-    private QrisService qrisService;
+    private final QrisService qrisService;
+
+    public DynamicQris(QrisService qrisService) {
+        this.qrisService = qrisService;
+    }
 
 
     @Deprecated
@@ -39,7 +39,8 @@ public class DynamicQris {
         try {
             quickResponseStringGenerator.qrStringNew(qr, amount, uuid);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest()
+                    .build();
         }
         Path path = Path.of("src/main/resources/static/" + uuid + ".png");
         try {
@@ -48,13 +49,15 @@ public class DynamicQris {
             if (!file.exists()) {
                 return ResponseEntity.notFound().build();
             }
-            Qris savedQris = qrisService.saveImage(file, GenerateQrisRequest.builder()
+            Qris savedQris = qrisService.saveImage(file, GenerateQrisRequest
+                    .builder()
                     .build());
 
             // Prepare Delete File
             File fileToDelete = new File(path.toString());
             fileToDelete.delete();
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedQris.getId());
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(savedQris.getId());
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -68,10 +71,9 @@ public class DynamicQris {
         Path path = Path.of("src/main/resources/static/" + uuid + ".png");
         QuickResponseStringGenerator quickResponseStringGenerator = new QuickResponseStringGenerator();
         try {
-            quickResponseStringGenerator.qrStringNew(generateQrisRequest.getQr(), generateQrisRequest.getAmount(), uuid);
-        } catch (WriterException writerException){
-            return new WebResponse<>("Error Generating QR", null);
-        } catch (IOException ioException) {
+            quickResponseStringGenerator.qrStringNew(generateQrisRequest.getQr(),
+                    generateQrisRequest.getAmount(), uuid);
+        } catch (WriterException | IOException writerException){
             return new WebResponse<>("Error Generating QR", null);
         }
         try {
@@ -90,7 +92,10 @@ public class DynamicQris {
             // Prepare Delete File
             File fileToDelete = new File(path.toString());
             fileToDelete.delete();
-            return new WebResponse<>(GenerateQrisRequest.builder().qr(savedQris.getId()).amount(savedQris.getAmount()).build(), null);
+            return new WebResponse<>(GenerateQrisRequest.builder()
+                    .qr(savedQris.getId())
+                    .amount(savedQris.getAmount())
+                    .build(), null);
         } catch (IOException e) {
             return new WebResponse<>("Error Saving Image", null);
         }
