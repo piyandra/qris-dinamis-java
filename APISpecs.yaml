@@ -9,19 +9,15 @@ servers:
 paths:
   /photo:
     get:
-      summary: Generate QR code
-      description: Generate Image QR code from the provided query parameters.
       deprecated: true
       parameters:
         - name: qr
           in: query
-          description: String Of QR Code.
           required: true
           schema:
             type: string
         - name: amount
           in: query
-          description: Amount.
           required: true
           schema:
             type: string
