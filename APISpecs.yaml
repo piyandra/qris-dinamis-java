@@ -1,0 +1,106 @@
+openapi: 3.0.3
+info:
+  title: Dynamic QRIS API
+  description: API for generating and retrieving QR code images.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+paths:
+  /photo:
+    get:
+      summary: Generate QR code
+      description: Generate Image QR code from the provided query parameters.
+      deprecated: true
+      parameters:
+        - name: qr
+          in: query
+          description: String Of QR Code.
+          required: true
+          schema:
+            type: string
+        - name: amount
+          in: query
+          description: Amount.
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: QR code generated successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad request. Missing or invalid parameters.
+    post:
+      summary: Generate and save QR code
+      description: Generates a QR code image from the provided request body and saves it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateQrisRequest'
+      responses:
+        '200':
+          description: QR code generated and saved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebResponse'
+        '400':
+          description: Error generating QR code.
+  /photo/{id}:
+    get:
+      summary: Retrieve QR code image
+      description: Retrieves the QR code image associated with the given ID.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the QR code image to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: QR code image retrieved successfully.
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad request.
+        '404':
+          description: QR code image not found.
+components:
+  schemas:
+    GenerateQrisRequest:
+      type: object
+      properties:
+        qr:
+          type: string
+          description: The QR code content.
+        amount:
+          type: string
+          description: The amount associated with the QR code.
+      required:
+        - qr
+        - amount
+    WebResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          description: The response data.
+        message:
+          type: string
+          description: The response message.
+    QrisGetDataRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the QR code request.

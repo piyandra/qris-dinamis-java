@@ -85,9 +85,6 @@ public class DynamicQris {
         }
         try {
             File file = new File(path.toString());
-            if (!file.exists()) {
-                return new WebResponse<>("File Not Found", null);
-            }
             Qris savedQris = qrisService.saveImage(file, generateQrisRequest);
             // Prepare Delete File
             File fileToDelete = new File(path.toString());
